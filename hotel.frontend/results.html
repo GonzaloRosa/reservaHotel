@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resultados de búsqueda</title>
+  <link rel="stylesheet" href="styles-results.css" />
+  <link rel="stylesheet" href="styles-header.css">
+</head>
+<body>
+    <header>
+      <a class="hipervinculo" href="index.html">
+        <div class="logo">Reserva de Hotel</div>
+      </a>
+    </header>
+
+  <h1>Opciones disponibles</h1>
+  <div id="results-container"></div>
+
+  <script>
+  const data = JSON.parse(localStorage.getItem("searchData")) || {};
+  const totalPersonas = (parseInt(data.adults) || 0) + (parseInt(data.children) || 0);
+  const habitaciones = parseInt(data.rooms) || 1;
+
+const hotelesPequenos = [
+  {
+    nombreHotel: "Hotel Boutique Central",
+    imagen: "https://images.trvl-media.com/lodging/28000000/27750000/27746500/27746464/359bc69a.jpg?impolicy=fcrop&w=1200&h=800&p=1&q=medium",
+    descripcion: "Ideal para parejas o viajes cortos en la ciudad."
+  },
+  {
+    nombreHotel: "Hotel Minimalista",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJWq2mMNY5tI0mp5vzR0nznuNzBlTfRoyBFQ&s",
+    descripcion: "Moderno, práctico y bien ubicado para viajeros solos."
+  },
+  {
+    nombreHotel: "City Hotel Urban",
+    imagen: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/07/53/65/71/urban-city-hotel.jpg?w=700&h=-1&s=1",
+    descripcion: "Céntrico, cómodo y con buen acceso al transporte."
+  },
+  {
+    nombreHotel: "Casa Blanca",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTibxD5YXoy8uvIDt2npoUOv9v4cvyNMuguvQ&s",
+    descripcion: "Pequeño hotel con encanto en zona tranquila."
+  },
+  {
+    nombreHotel: "Petit Hotel Sol",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXR_keEGpcLCJIh_3_qXGYO8Mi-bcFSWMOHg&s",
+    descripcion: "Con estilo mediterráneo y atención personalizada."
+  },
+  {
+    nombreHotel: "Hotel Azul Cielo",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9mVngRTnfq5nyFUPgOK5TFMdkzlPMuyBDeA&s",
+    descripcion: "Tranquilo y perfecto para una escapada urbana."
+  },
+  {
+    nombreHotel: "Hotel Encanto Colonial",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcd0xsPwbmfwEa7ooKbdRcGmLLNvJLNhGx_g&s",
+    descripcion: "Estilo tradicional con ambiente hogareño."
+  },
+  {
+    nombreHotel: "Eco Hotel Verde",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxuj80EjbTte1jRNhcoehZlBIGSBmghp_Clg&s",
+    descripcion: "Sostenible y rodeado de naturaleza."
+  }
+];
+
+const hotelesFamiliares = [
+  {
+    nombreHotel: "Resort Familiar Costa Azul",
+    imagen: "https://www.hotelesgarbi.com/assets/cache/uploads/hotel-garbi-costa-luz/900x585/01-f-gcl-9151.jpg",
+    descripcion: "Perfecto para unas vacaciones en familia cerca del mar."
+  },
+  {
+    nombreHotel: "Hotel Jardines del Sol",
+    imagen: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/499731180.jpg?k=f676b1df7274cee905999f9a36ead469572279c2e76e7e4c029637e893229876&o=&hp=1",
+    descripcion: "Con espacios verdes y actividades para niños."
+  },
+  {
+    nombreHotel: "Villa Familiar Horizonte",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ2zIvkLZPJ4Nefpq9vpGH7RivYLQ1Snef9Q&s",
+    descripcion: "Amplias habitaciones familiares y piscina."
+  },
+  {
+    nombreHotel: "Complejo Vacacional Oasis",
+    imagen: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/441488299.jpg?k=c38cc9d64bf1b87d97655c3d9b55899100065a97df26f2f76e8fdb14a509fc05&o=&hp=1",
+    descripcion: "Todo incluido y actividades para grandes y chicos."
+  },
+  {
+    nombreHotel: "Cabañas del Lago",
+    imagen: "https://q-xx.bstatic.com/xdata/images/hotel/max500/271154745.jpg?k=57e1d47f00b1685e3d0f67b91bc08f9b783859e80f7cb9eae0f9bf21af2d733a&o=",
+    descripcion: "Ideal para desconectar en familia en la naturaleza."
+  },
+  {
+    nombreHotel: "Club Vacacional Andes",
+    imagen: "https://media-cdn.tripadvisor.com/media/photo-s/11/f6/95/3f/nueva-direccion-en-centro.jpg",
+    descripcion: "Actividades deportivas, canchas y animación."
+  },
+  {
+    nombreHotel: "Parque Hotel de los Niños",
+    imagen: "https://ailoviu.net/wp-content/uploads/2019/08/Hoteles-vacaciones-con-ni%C3%B1os.jpg",
+    descripcion: "Con parque de juegos y menús infantiles."
+  },
+  {
+    nombreHotel: "Hotel Playa Tranquila",
+    imagen: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/320721183.jpg?k=d938d91a386282544902f08da7c8be49a66c422d585f36cd97575f5b2585ec99&o=&hp=1",
+    descripcion: "Frente al mar, con habitaciones familiares."
+  }
+];
+
+
+const hotelesGrandes = [
+  {
+    nombreHotel: "Gran Hotel Palacio",
+    imagen: "https://img.europapress.es/fotoweb/fotonoticia_20111002171049_690.jpg",
+    descripcion: "Lujo, confort y espacios amplios para grupos."
+  },
+  {
+    nombreHotel: "Centro de Convenciones Premier",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTo2lHsaEeuGmXM_fxbKSjitCCaxm2Gd5xACg&s",
+    descripcion: "Perfecto para eventos y grandes familias."
+  },
+  {
+    nombreHotel: "Hotel Torre Dorada",
+    imagen: "https://www.servigroup.com/assets/cache/uploads/hoteles/torre-dorada/piscina/2048x1366/02-benidorm-hotel-torre-dorada-fachada-piscina-01.jpg",
+    descripcion: "Elegancia en el corazón financiero de la ciudad."
+  },
+  {
+    nombreHotel: "Luxury Palace",
+    imagen: "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/b7c3b6118647987.608d574741b81.jpg",
+    descripcion: "Ambiente exclusivo con atención de primer nivel."
+  },
+  {
+    nombreHotel: "Skyline Hotel",
+    imagen: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/58678979.jpg?k=a75c93f7aa9b2e2d38b4cd7c9a5c1027dac1947a3e89b24e99b4ebcba6c427a0&o=&hp=1",
+    descripcion: "Vistas impresionantes y diseño vanguardista."
+  },
+  {
+    nombreHotel: "Hotel Internacional Elite",
+    imagen: "https://y.cdrst.com/foto/hotel-sf/cf7e5/listcardm/hotel-del-centro-habitacion-dd5f1db.jpg",
+    descripcion: "Diseño moderno, restaurante gourmet y spa."
+  },
+  {
+    nombreHotel: "Hotel Imperial",
+    imagen: "https://imperial-park.buenosaireshotelsargentina.com/data/Images/OriginalPhoto/3102/310253/310253849/image-buenos-aires-imperial-park-hotel-57.JPEG",
+    descripcion: "Referente de hospitalidad clásica y servicio VIP."
+  },
+  {
+    nombreHotel: "Capital Center Hotel",
+    imagen: "https://images.trvl-media.com/lodging/46000000/45670000/45669200/45669118/1cfc8408.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill",
+    descripcion: "Cerca de todo, con estilo y distinción."
+  }
+];
+
+
+
+  // Selección basada en cantidad de personas y habitaciones
+  let hotelesAMostrar = [];
+
+  if (totalPersonas <= 2 && habitaciones === 1) {
+    hotelesAMostrar = hotelesPequenos;
+  } else if (totalPersonas <= 4 && habitaciones <= 2) {
+    hotelesAMostrar = hotelesFamiliares;
+  } else {
+    hotelesAMostrar = hotelesGrandes;
+  }
+
+  // Renderizado
+const container = document.getElementById("results-container");
+
+hotelesAMostrar.forEach(hotel => {
+  const hotelContainer = document.createElement("div");
+  hotelContainer.className = "hotel-container";
+
+  // Precio aleatorio
+  const precioBase = Math.floor(Math.random() * (300000 - 180000 + 1)) + 180000; // entre $180.000 y $300.000
+  const impuestos = Math.floor(precioBase * 0.10); // 10% de impuestos
+
+  const card = document.createElement("div");
+  card.className = "hotel-card-horizontal";
+
+  card.innerHTML = `
+    <img src="${hotel.imagen}" alt="${hotel.nombreHotel}" />
+    <div class="hotel-info">
+      <h2>${hotel.nombreHotel}</h2>
+      <p class="descripcion">${hotel.descripcion}</p>
+      <div class="detalles">
+        <strong>Tu búsqueda:</strong><br/>
+        <br/>Destino: ${data.destination || '-'}<br/>
+        Fechas: ${data.dateRange || '-'}<br/>
+        Adultos: ${data.adults || 0}, Niños: ${data.children || 0}, Habitaciones: ${data.rooms || 0}
+      </div>
+    </div>
+    <div class="hotel-reserva">
+      <p class="precio">$ ${precioBase.toLocaleString('es-ES')}</p>
+      <p class="impuestos">+ $ ${impuestos.toLocaleString('es-ES')} de impuestos y cargos</p>
+    </div>
+  `;
+
+  const boton = document.createElement("button");
+  boton.className = "btn-reservar";
+  boton.textContent = "Reservar Ahora";
+
+  boton.addEventListener("click", () => {
+    const reserva = {
+      nombreHotel: hotel.nombreHotel,
+      descripcion: hotel.descripcion,
+      destino: data.destination || '-',
+      fechas: data.dateRange || '-',
+      adultos: data.adults || 0,
+      niños: data.children || 0,
+      habitaciones: data.rooms || 0,
+      precio: precioBase + impuestos
+    };
+    localStorage.setItem("reservaSeleccionada", JSON.stringify(reserva));
+    window.location.href = "reserva.html";
+  });
+
+  hotelContainer.appendChild(card);
+  hotelContainer.appendChild(boton);
+  container.appendChild(hotelContainer);
+});
+
+</script>
+</body>
+</html>

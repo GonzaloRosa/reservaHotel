@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmar Reserva</title>
+  <link rel="stylesheet" href="styles-reserva.css">
+</head>
+<body>
+   <header>
+    <a href="index.html" class="hipervinculo logo">Reserva de Hotel</a>
+  </header>
+
+  <main class="contenido-central">
+    <div id="reserva-detalles"></div>
+    <button id="confirmar">Confirmar Reserva</button>
+  </main>
+</body>
+
+<script>
+  const reserva = JSON.parse(localStorage.getItem("reservaSeleccionada"));
+  const userEmail = localStorage.getItem("userEmail");
+  const detalles = document.getElementById("reserva-detalles");
+  const btnConfirmar = document.getElementById("confirmar");
+
+  if (reserva) {
+    detalles.innerHTML = `
+      <h2>Reservando: ${reserva.nombreHotel}</h2>
+      <p>${reserva.descripcion}</p>
+      <p><strong>Destino:</strong> ${reserva.destino}</p>
+      <p><strong>Fechas:</strong> ${reserva.fechas}</p>
+      <p><strong>Adultos:</strong> ${reserva.adultos}, 
+         <strong>Niños:</strong> ${reserva.niños}, 
+         <strong>Habitaciones:</strong> ${reserva.habitaciones}</p>
+      <p><strong>Precio:</strong> $${reserva.precio}</p>
+    `;
+
+    btnConfirmar.addEventListener("click", () => {
+      const reservaConEmail = {
+        ...reserva,
+        email: userEmail
+      };
+
+      fetch("http://localhost:8085/api/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reservaConEmail)
+      })
+      .then(res => res.json())
+      .then(() => {
+        localStorage.removeItem("reservaSeleccionada");
+        window.location.href = "exito.html";
+      })
+      .catch(error => {
+        alert("Error al confirmar la reserva.");
+        console.error(error);
+      });
+    });
+  } else {
+    detalles.innerHTML = "<p>No hay datos de reserva.</p>";
+    btnConfirmar.disabled = true;
+  }
+</script>
+</body>
+</html>
+

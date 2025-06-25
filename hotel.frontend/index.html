@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Encuentra tu próximo hotel</title>
+  <script>
+    // Verificación rápida de autenticación
+    if (localStorage.getItem("isAuthenticated") !== "true") {
+      window.location.href = "register.html"; // o "login.html"
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Reserva hoteles, casas y más con las mejores ofertas. Clon de Booking.com desarrollado con HTML, CSS y JS." />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <div class="navbar-top">
+      <a class="hipervinculo" href="index.html">
+        <div class="logo" aria-label="Inicio">Reserva de Hotel</div>
+      </a>
+      <nav class="navbar-right" aria-label="Opciones de usuario">
+        <div class="topbar-buttons">
+          <span id="user-email" style="color: white; margin-right: 15px; font-weight: bold; display:none;"></span>
+          <div class="currency-dropdown">
+            <button id="currency-button">
+              <img src="https://flagcdn.com/ar.svg" class="flag-icon-img" alt="flag">
+              <span id="currency-label">ARS</span>
+            </button>
+            <ul id="currency-menu" class="hidden">
+              <li data-currency="USD" data-flag="us">USD</li>
+              <li data-currency="EUR" data-flag="eu">EUR</li>
+              <li data-currency="ARS" data-flag="ar">ARS</li>
+            </ul>
+          </div>
+        </div>
+        <a href="register.html"><button>Hazte una cuenta</button></a>
+        <a href="login.html"><button>Inicia sesión</button></a>
+        <a href="consultar.html"><button>Consultar Reservas</button></a>
+        <button onclick="logout()">Cerrar sesión</button>
+      </nav>
+    </div>
+    <nav class="navbar-bottom" aria-label="Menú principal">
+      <span class="desktop-item" role="button" aria-label="Buscar alojamiento">
+        <i class="fa fa-bed"></i> Alojamiento
+      </span>
+      <span class="desktop-item" role="button" aria-label="Buscar vuelos">
+        <i class="fa fa-plane"></i> Vuelos
+      </span>
+      <span class="desktop-item" role="button" aria-label="Buscar alquiler de autos">
+        <i class="fa fa-car"></i> Alquiler de autos
+      </span>
+      <span class="desktop-item" role="button" aria-label="Atracciones turísticas">
+        <i class="fa fa-map-marker"></i> Atracciones
+      </span>
+      <span class="desktop-item" role="button" aria-label="Taxis aeropuerto">
+        <i class="fa fa-taxi"></i> Taxis aeropuerto
+      </span>
+    </nav>
+    </nav>
+  </header>
+
+  <div id="alerta" class="alerta-oculta">
+    <p id="mensaje-alerta"></p>
+  </div>
+
+  <!-- HERO CON SEARCH BAR INCLUIDO -->
+  <main class="hero" role="main">
+    <h1>Encuentra tu próxima estancia</h1>
+    <p>Busca ofertas en hoteles, casas y mucho más...</p>
+    <form class="search-bar" role="search" aria-label="Formulario de búsqueda">
+      <div class="search-section">
+        <label for="destination" class="sr-only">Destino</label>
+        <i class="fa fa-bed" aria-hidden="true"></i>
+        <input type="text" id="destination" placeholder="¿Adónde vas?" autocomplete="off" aria-label="Destino" />
+        <div id="suggestions" class="autocomplete-items" role="listbox" aria-label="Sugerencias de búsqueda"></div>
+      </div>
+
+      <div class="search-section">
+        <label for="date-range" class="sr-only">Fechas</label>
+        <i class="fa fa-calendar" aria-hidden="true"></i>
+        <input type="text" id="date-range" placeholder="Fecha de entrada - salida" readonly
+          aria-label="Rango de fechas" />
+      </div>
+
+      <div class="search-section" id="guest-section" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-user" aria-hidden="true"></i>
+        <span id="guest-display">2 adultos · 0 niños · 1 habitación</span>
+        <div class="dropdown" id="guest-dropdown" role="dialog" aria-label="Seleccionar cantidad de personas">
+          <div class="dropdown-row">
+            <span>Adultos</span>
+            <div class="counter" aria-label="Cantidad de adultos">
+              <button type="button" onclick="changeCount('adult', -1)" aria-label="Disminuir adultos">−</button>
+              <span id="adult-count">2</span>
+              <button type="button" onclick="changeCount('adult', 1)" aria-label="Aumentar adultos">+</button>
+            </div>
+          </div>
+          <div class="dropdown-row">
+            <span>Niños</span>
+            <div class="counter" aria-label="Cantidad de niños">
+              <button type="button" onclick="changeCount('child', -1)" aria-label="Disminuir niños">−</button>
+              <span id="child-count">0</span>
+              <button type="button" onclick="changeCount('child', 1)" aria-label="Aumentar niños">+</button>
+            </div>
+          </div>
+          <div class="dropdown-row">
+            <span>Habitaciones</span>
+            <div class="counter" aria-label="Cantidad de habitaciones">
+              <button type="button" onclick="changeCount('room', -1)" aria-label="Disminuir habitaciones">−</button>
+              <span id="room-count">1</span>
+              <button type="button" onclick="changeCount('room', 1)" aria-label="Aumentar habitaciones">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="search-button" type="submit" aria-label="Buscar">Buscar</button>
+    </form>
+  </main>
+
+  <!-- OFERTAS -->
+  <section class="offers" aria-label="Ofertas destacadas">
+    <h2>Ofertas Destacadas</h2>
+    <div class="offer-grid">
+      <article class="offer-card" role="article">
+        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+          alt="Hotel Plaza" />
+        <div class="card-content">
+          <h3>Hotel Plaza</h3>
+          <p>Disfruta de una estancia en el corazón de la ciudad con todas las comodidades.</p>
+          <span class="badge-price" data-price="120">US$120 por noche</span>
+        </div>
+      </article>
+      <article class="offer-card" role="article">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+          alt="Marina Resort" />
+        <div class="card-content">
+          <h3>Marina Resort</h3>
+          <p>Vistas increíbles y lujo accesible para familias y parejas.</p>
+          <span class="badge-price" data-price="180">US$180 por noche</span>
+        </div>
+      </article>
+      <article class="offer-card" role="article">
+        <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80"
+          alt="Montaña Lodge" />
+        <div class="card-content">
+          <h3>Montaña Lodge</h3>
+          <p>Relájate en un entorno natural con actividades al aire libre y confort total.</p>
+          <span class="badge-price" data-price="95">US$95 por noche</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div id="alerta" class="alerta-oculta">
+    <span class="icono-alerta">❗</span>
+    <p id="mensaje-alerta"></p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer role="contentinfo">
+    <p>&copy; 2025. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+  <script src="script.js"></script>
+  <script src="results.js"></script>
+  <script>
+  
+  document.addEventListener("DOMContentLoaded", function () {
+  
+  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+  const userEmail = localStorage.getItem("userEmail");
+
+  const loginBtn = document.querySelector('a[href="login.html"]');
+  const registerBtn = document.querySelector('a[href="register.html"]');
+  const logoutBtn = document.querySelector('button[onclick="logout()"]');
+  const userEmailSpan = document.getElementById("user-email");
+
+  if (isAuthenticated && userEmail) {
+    if (loginBtn) loginBtn.style.display = "none";
+    if (registerBtn) registerBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "inline-block";
+
+    if (userEmailSpan) {
+      userEmailSpan.textContent = userEmail;
+      userEmailSpan.style.display = "inline";
+    }
+  } else {
+    if (loginBtn) loginBtn.style.display = "inline-block";
+    if (registerBtn) registerBtn.style.display = "inline-block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+
+    if (userEmailSpan) {
+      userEmailSpan.textContent = "";
+      userEmailSpan.style.display = "none";
+    }
+  }
+});
+
+  function logout() {
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("userEmail");
+      window.location.href = "login.html"; // o register.html
+    }
+  </script>
+</body>
+
+</html>

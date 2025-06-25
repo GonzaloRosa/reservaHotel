@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles-form.css">
+  <link rel="stylesheet" href="styles-alert.css">
+</head>
+<body>
+
+<header>
+  <a class="hipervinculo"><div class="logo">Reserva de Hotel</div></a>
+</header>
+
+<div class="form-container">
+  <h2>Iniciar sesión</h2>
+  <p>Accede con tu email y contraseña</p>
+  
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Tu dirección de email" required>
+    <input type="password" id="password" placeholder="Tu contraseña" required>
+    <button type="submit">Iniciar sesión</button>
+  </form>
+  
+<div id="alerta-exito" class="alerta alerta-oculta">
+  <i class="fas fa-check-circle"></i>
+  <span id="mensaje-exito"></span>
+</div>
+
+<div id="alerta-error" class="alerta alerta-oculta">
+  <i class="fas fa-exclamation-triangle"></i>
+  <span id="mensaje-error"></span>
+</div>
+
+  <div class="terms">
+    Al iniciar sesión, aceptas nuestros <a href="#">Términos</a>, <a href="#">Condiciones</a> y la <a href="#">Política de privacidad</a>.
+  </div>
+
+  <div class="footer">
+    Todos los derechos reservados.<br>
+  </div>
+</div>
+
+<script src="success.js"></script>
+
+</body>
+</html>

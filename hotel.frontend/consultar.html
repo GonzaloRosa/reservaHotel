@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mis Reservas</title>
+  <link rel="stylesheet" href="styles-consulta.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="navbar-top">
+      <a href="index.html" class="logo">Reserva de Hotel</a>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <h1>Mis Reservas</h1>
+    <button id="consultar">Consultar Reservas</button>
+    <div id="lista-reservas" class="reservas-grid"></div>
+  </main>
+
+<script>
+  const btnConsultar = document.getElementById("consultar");
+  const lista = document.getElementById("lista-reservas");
+
+  btnConsultar.addEventListener("click", () => {
+    const emailUsuario = localStorage.getItem("userEmail");
+
+    if (!emailUsuario) {
+      lista.innerHTML = "<p>Debes iniciar sesión para ver tus reservas.</p>";
+      return;
+    }
+
+    fetch(`http://localhost:8085/api/reservas/${emailUsuario}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length === 0) {
+          lista.innerHTML = "<p>No hay reservas registradas para tu cuenta.</p>";
+          return;
+        }
+
+        lista.innerHTML = data.map(reserva => `
+          <div class="reserva-card">
+            <h2>${reserva.nombreHotel || reserva.hotel}</h2>
+            <p class="descripcion">${reserva.descripcion || ''}</p>
+            <p><strong>Destino:</strong> ${reserva.destino || ''}</p>
+            <p><strong>Fechas:</strong> ${reserva.fechas || ''}</p>
+            <p><strong>Adultos:</strong> ${reserva.adultos || 1} | 
+               <strong>Niños:</strong> ${reserva.niños || 0} | 
+               <strong>Habitaciones:</strong> ${reserva.habitaciones || 1}</p>
+            <p class="precio"><strong>Precio:</strong> $${reserva.precio || 0}</p>
+          </div>
+        `).join('');
+      })
+      .catch(err => {
+        console.error("Error al obtener reservas:", err);
+        lista.innerHTML = "<p>Error al consultar las reservas.</p>";
+      });
+  });
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
+</html>
