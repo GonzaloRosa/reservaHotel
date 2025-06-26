@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <title>Mis Reservas</title>
   <link rel="stylesheet" href="styles-consulta.css" />
 </head>
+
 <body>
   <header class="navbar">
     <div class="navbar-top">
@@ -16,9 +18,21 @@
     <h1>Mis Reservas</h1>
     <button id="consultar">Consultar Reservas</button>
     <div id="lista-reservas" class="reservas-grid"></div>
+    <!-- Toast container -->
+    <div id="toast"></div>
+
+    <!-- Confirm dialog overlay -->
+    <div id="confirmOverlay">
+      <div id="confirmBox">
+        <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+        <button id="confirmYes">Sí, cancelar</button>
+        <button id="confirmNo">No</button>
+      </div>
+    </div>
+
   </main>
 
-<script>
+ <script>
   const btnConsultar = document.getElementById("consultar");
   const lista = document.getElementById("lista-reservas");
 
@@ -39,15 +53,16 @@
         }
 
         lista.innerHTML = data.map(reserva => `
-          <div class="reserva-card">
+          <div class="reserva-card" id="reserva-${reserva.id}">
             <h2>${reserva.nombreHotel || reserva.hotel}</h2>
             <p class="descripcion">${reserva.descripcion || ''}</p>
             <p><strong>Destino:</strong> ${reserva.destino || ''}</p>
             <p><strong>Fechas:</strong> ${reserva.fechas || ''}</p>
-            <p><strong>Adultos:</strong> ${reserva.adultos || 1} | 
-               <strong>Niños:</strong> ${reserva.niños || 0} | 
+            <p><strong>Adultos:</strong> ${reserva.adultos || 1} |
+               <strong>Niños:</strong> ${reserva.niños || 0} |
                <strong>Habitaciones:</strong> ${reserva.habitaciones || 1}</p>
             <p class="precio"><strong>Precio:</strong> $${reserva.precio || 0}</p>
+            <button class="cancelar-btn" onclick="confirmarCancelar(${reserva.id})">Cancelar reserva</button>
           </div>
         `).join('');
       })
@@ -57,6 +72,58 @@
       });
   });
 
+  // Toast show/hide
+  function mostrarToast(mensaje) {
+    const toast = document.getElementById("toast");
+    toast.textContent = mensaje;
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+  }
+
+  // Confirm dialog logic
+  const confirmOverlay = document.getElementById("confirmOverlay");
+  const btnConfirmYes = document.getElementById("confirmYes");
+  const btnConfirmNo = document.getElementById("confirmNo");
+  let reservaIdACancelar = null;
+
+  function confirmarCancelar(id) {
+    reservaIdACancelar = id;
+    confirmOverlay.style.display = "flex";
+  }
+
+  btnConfirmYes.addEventListener("click", () => {
+    cancelarReserva(reservaIdACancelar);
+    confirmOverlay.style.display = "none";
+    reservaIdACancelar = null;
+  });
+
+  btnConfirmNo.addEventListener("click", () => {
+    confirmOverlay.style.display = "none";
+    reservaIdACancelar = null;
+  });
+
+  // Cancel reservation
+  function cancelarReserva(id) {
+    fetch(`http://localhost:8085/api/reservas/${id}`, {
+      method: 'DELETE'
+    })
+    .then(res => {
+      if (res.ok) {
+        const elemento = document.getElementById(`reserva-${id}`);
+        if (elemento) elemento.remove();
+        mostrarToast("Reserva cancelada con éxito.");
+      } else {
+        mostrarToast("No se pudo cancelar la reserva.");
+      }
+    })
+    .catch(err => {
+      console.error("Error al cancelar reserva:", err);
+      mostrarToast("Ocurrió un error al cancelar la reserva.");
+    });
+  }
+
   function logout() {
     localStorage.clear();
     window.location.href = "login.html";
@@ -64,4 +131,5 @@
 </script>
 
 </body>
+
 </html>

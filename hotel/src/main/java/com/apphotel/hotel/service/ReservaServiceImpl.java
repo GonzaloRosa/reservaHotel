@@ -29,4 +29,13 @@ public class ReservaServiceImpl implements ReservaService {
         return reservaRepository.findByEmail(email);
     }
 
+    @Override
+    public boolean eliminarPorId(Long id) {
+        if (reservaRepository.existsById(id)) {
+            reservaRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
 }
